@@ -1,0 +1,14 @@
+xsim.dir/
+logs/
+*.log
+*.jou
+*.pb
+*.wdb
+*.str
+*.vdi
+*.vcd
+.Xil/
+
+# --- Temporary files ---
+*~
+*.swp
