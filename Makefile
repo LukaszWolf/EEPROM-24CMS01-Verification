@@ -1,12 +1,23 @@
-SNAPSHOT   = sim_snapshot
-TOP_MODULE = tb_lib.top_tb
+GUI    ?= 0
+WAVE   ?= 0
+SNAPSHOT = sim_snapshot
+TOP_MODULE = tb_lib.top
 LOG_DIR    = logs
 
-all:
-	@$(MAKE) full QUIET="> /dev/null"
-	@$(MAKE) filter
-	@$(MAKE) clean
+ifeq ($(WAVE), 1)
+    VLOG_FLAGS = -d DUMP_WAVES
+endif
 
+ifeq ($(GUI), 1)
+    XSIM_FLAGS = -gui
+else
+    XSIM_FLAGS = -runall
+endif
+
+all:
+	@$(MAKE) --no-print-directory full QUIET="> /dev/null"
+	@$(MAKE) --no-print-directory filter
+	
 full: prep comp_rtl comp_tb elab run
 	@echo "Logs: $(LOG_DIR)/"
 
@@ -15,40 +26,39 @@ prep:
 
 comp_rtl:
 	@echo -n "RTL COMPILATION (rtl_lib)... "
-	@xvlog -sv -work rtl_lib -f rtl/rtl.f -log $(LOG_DIR)/comp_rtl.log $(QUIET) \
-		|| (echo "ERROR! log:"; cat $(LOG_DIR)/comp_rtl.log; exit 1)
+	@xvlog $(VLOG_FLAGS) -sv -work rtl_lib -f rtl/rtl.f -log $(LOG_DIR)/comp_rtl.log $(QUIET) \
+        || (echo "ERROR! log:"; cat $(LOG_DIR)/comp_rtl.log; exit 1)
 	@echo "OK"
 
 comp_tb:
 	@echo -n "TB COMPILATION(tb_lib)...  "
-	@xvlog -sv -work tb_lib -L rtl_lib -f tb/tb.f -log $(LOG_DIR)/comp_tb.log $(QUIET) \
-		|| (echo "ERROR! log:"; cat $(LOG_DIR)/comp_tb.log; exit 1)
+	@xvlog $(VLOG_FLAGS) -sv -work tb_lib -L rtl_lib -f tb/tb.f -log $(LOG_DIR)/comp_tb.log $(QUIET) \
+        || (echo "ERROR! log:"; cat $(LOG_DIR)/comp_tb.log; exit 1)
 	@echo "OK"
 
 elab:
 	@echo -n "Elaboration...              "
 	@xelab -debug typical $(TOP_MODULE) -L rtl_lib -L tb_lib -s $(SNAPSHOT) -log $(LOG_DIR)/elab.log $(QUIET) \
-		|| (echo "ERROR! Slog:"; cat $(LOG_DIR)/elab.log; exit 1)
+        || (echo "ERROR! log:"; cat $(LOG_DIR)/elab.log; exit 1)
 	@echo "OK"
 
 run:
 	@echo -n "Simulation...               "
-	@xsim $(SNAPSHOT) -runall -log $(LOG_DIR)/xsim.log $(QUIET) \
-		|| (echo "ERROR! log:"; cat $(LOG_DIR)/xsim.log; exit 1)
+	@xsim $(SNAPSHOT) $(XSIM_FLAGS) -log $(LOG_DIR)/xsim.log $(QUIET) \
+        || (echo "ERROR! log:"; cat $(LOG_DIR)/xsim.log; exit 1)
 	@echo "OK"
 
 filter:
 	@echo ""
-	@echo "=== TESTBENCH LOGS ==="
+	@echo "=== SIMULATION LOGS ==="
 	@if [ -f $(LOG_DIR)/xsim.log ]; then \
-		grep -E "\[[0-9]+\]" $(LOG_DIR)/xsim.log || echo "No logs available."; \
+		sed -n '/run -all/,/exit/p' $(LOG_DIR)/xsim.log | grep -v "run -all" | grep -v "xsim" | grep -v "exit"; \
+	else \
+		echo "Brak pliku logu!"; \
 	fi
-	@echo "========================="
+	@echo "==========================="
 	@echo ""
 
 clean:
 	@rm -rf xsim.dir *.jou *.pb *.wdb *.str $(LOG_DIR)
 	@echo "Folder Cleaned."
-
-gui:
-	xsim $(SNAPSHOT) -gui

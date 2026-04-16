@@ -1,19 +1,39 @@
+`timescale 1ns / 10ps
+
+import i2c_operations_pkg::*;
+
 module dut (
-    input  logic clk,
-    input  logic rstn,
-    output logic [3:0] count
+    input  logic        clk,
+    input  logic        rst_n,
+    input  operation_t  op_sel,
+    input  logic        start,
+    input  logic [7:0]  write_data_in,
+    output logic [23:0] read_data,
+    output logic        busy,
+    output logic        done
 );
-    
-    always @(posedge rstn) begin
-        $display("[%0t] DUT: Reset zwolniony, liczenie rozpoczete", $time);
-    end
+    tri1 scl; 
+    tri1 sda;
 
-    always_ff @(posedge clk or negedge rstn) begin
-        if (!rstn) begin
-            count <= 4'b0000;
-        end else begin
-            count <= count + 1;
-        end
-    end
+    controller i_ctrl (
+        .clk       (clk),
+        .rst_n     (rst_n),
+        .op_sel       (op_sel),
+        .start     (start),
+        .write_data_in  (write_data_in), 
+        .read_data (read_data),
+        .busy      (busy),
+        .done      (done),
+        .scl       (scl),
+        .sda       (sda)
+    );
+
+    M24CSM01 i_model (
+        .A1(1'b0), 
+        .A2(1'b0), 
+        .WP(1'b0),
+        .SDA(sda), 
+        .SCL(scl),
+        .RESET(!rst_n)
+    );
 endmodule
-
