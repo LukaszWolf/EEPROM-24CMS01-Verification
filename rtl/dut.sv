@@ -3,6 +3,7 @@
 import i2c_operations_pkg::*;
 
 module dut (
+    input logic [15:0] addr_in,
     input  logic        clk,
     input  logic        rst_n,
     input  operation_t  op_sel,
@@ -16,6 +17,7 @@ module dut (
     tri1 sda;
 
     controller i_ctrl (
+        .addr_in   (addr_in),
         .clk       (clk),
         .rst_n     (rst_n),
         .op_sel       (op_sel),

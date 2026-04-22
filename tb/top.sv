@@ -1,6 +1,7 @@
 `timescale 1ns / 10ps
 
 module top();
+    wire [15:0] addr;
     wire clk, rst_n;
     operation_t op_sel;
     wire start;
@@ -9,6 +10,7 @@ module top();
     wire busy, done;
 
     tb_top i_tb (
+        .addr_in(addr),
         .clk(clk),
         .rst_n(rst_n),
         .op_sel(op_sel), 
@@ -20,6 +22,7 @@ module top();
     );
 
     dut i_dut (
+        .addr_in(addr),
         .clk(clk), 
         .rst_n(rst_n),
         .op_sel(op_sel), 

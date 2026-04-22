@@ -3,6 +3,7 @@
 import i2c_operations_pkg::*;
 
 module tb_top (
+    output logic [15:0] addr_in,
     output logic       clk,
     output logic       rst_n,
     output operation_t   op_sel,    
@@ -12,6 +13,8 @@ module tb_top (
     input  logic       busy,
     input  logic       done
 );
+    logic [15:0] local_rand_addr;
+    logic [7:0]  expected_data;
     // Clock generator
     initial begin
         clk = 0;
@@ -22,6 +25,7 @@ module tb_top (
         rst_n = 0;
         op_sel = OP_READ_DATA;
         start = 0;
+        addr_in = 0;
         #100;
         rst_n = 1;
 
@@ -57,31 +61,46 @@ module tb_top (
 
         #100us;
 
-        // --- 11: Write data---
-        $display("\n[%t] === TEST 3: Zapis 0x55 pod adres 0x0005 ===", $time);
-        write_data_in = 8'h55;
-        op_sel = OP_WRITE_DATA;
-        @(posedge clk);
-        start = 1;
-        @(posedge clk);
-        start = 0;
-        wait(busy);    
-        wait(done);    
-        $display("[%t] TB: Zakończono sekwencję zapisu.", $time);
+        repeat (40) begin
 
-        #6ms; 
-        // --- 00: Read data ---
-        $display("\n[%t] === TEST 4: Odczyt danych z adresu 0x0005 ===", $time);
-        op_sel = OP_READ_DATA;
-        @(posedge clk);
-        start = 1;
-        @(posedge clk);
-        start = 0;
+            if (!std::randomize(local_rand_addr)) $error("Błąd randomizacji adresu");
+            if (!std::randomize(write_data_in))    $error("Błąd randomizacji danych");
+            
+            addr_in       = local_rand_addr;
+            expected_data = write_data_in;
+            // --- 11: Write data---
+            $display("[%t] TB: Zapis 0x%h pod adres 0x%h", $time, expected_data, addr_in);
+            @(posedge clk);
+            op_sel = OP_WRITE_DATA;
+            start = 1;
+            @(posedge clk);
+            start = 0;
+            wait(busy);    
+            wait(done);    
 
-        wait(busy); 
-        wait(done);
-        $display("[%t] TB: Odczytano: %h", $time, read_data[7:0]);
+            #6ms; 
+            // --- 00: Read data ---
+            $display("[%t] TB: Odczyt z adresu 0x%h...", $time, addr_in);            
+            @(posedge clk);
+            op_sel = OP_READ_DATA;
+            start = 1;
+            @(posedge clk);
+            start = 0;
+            wait(busy); 
+            wait(done);
 
+            // --- Verification---
+            if (read_data[7:0] === expected_data) begin
+                $display(">>> TEST PASS: Adres 0x%h, Dane 0x%h OK", addr_in, read_data[7:0]);
+            end else begin
+                $error(">>> TEST FAIL: Adres 0x%h, Oczekiwano: 0x%h, Otrzymano: 0x%h", 
+                        addr_in, expected_data, read_data[7:0]);
+            end
+            
+            #100us;
+        end
+        $display("\n[%t] === KONIEC TESTÓW ===", $time);
+ 
         $finish;
     end
 endmodule

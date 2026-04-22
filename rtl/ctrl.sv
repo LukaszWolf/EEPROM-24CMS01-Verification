@@ -3,6 +3,7 @@
 import i2c_operations_pkg::*;
 
 module controller (
+    input logic [15:0] addr_in,
     input  logic        clk,
     input  logic        rst_n,
     input  operation_t  op_sel,
@@ -90,15 +91,15 @@ module controller (
                         OP_READ_DATA: begin
                             ctrl_w   <= 8'hA0; // Control Code dla EEPROM (Write)
                             ctrl_r   <= 8'hA1; // Control Code dla EEPROM (Read)
-                            addr_h   <= 8'h00; // Word Address High
-                            addr_l   <= 8'h05; // Word Address Low (0x0005)
+                            addr_h   <= addr_in[15:8]; // Word Address High
+                            addr_l   <= addr_in[7:0]; // Word Address Low
                             addr_len <= 2;     
                             data_len <= 1;
                         end
                         OP_WRITE_DATA: begin
                             ctrl_w   <= 8'hA0; 
-                            addr_h   <= 8'h00; // Adres zapisu H
-                            addr_l   <= 8'h05; // Adres zapisu L
+                            addr_h   <= addr_in[15:8]; // Adres zapisu H
+                            addr_l   <= addr_in[7:0]; // Adres zapisu L
                             addr_len <= 2;
                             is_write <= 1;
                         end
