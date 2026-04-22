@@ -1,4 +1,6 @@
+# --- Vivado / Xsim Junk ---
 xsim.dir/
+.Xil/
 logs/
 *.log
 *.jou
@@ -7,8 +9,9 @@ logs/
 *.str
 *.vdi
 *.vcd
-.Xil/
+usage_statistics_webtalk.xml
 
-# --- Temporary files ---
+# --- Temporary / Editor files ---
 *~
 *.swp
+*.bak

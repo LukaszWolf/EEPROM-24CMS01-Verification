@@ -1,20 +1,39 @@
+`timescale 1ns / 10ps
+
 module top();
-    logic clk_wire;
-    logic rstn_wire;
-    logic [3:0] count_wire;
+    wire clk, rst_n;
+    operation_t op_sel;
+    wire start;
+    wire [7:0] wdata;
+    wire [23:0] read_data;
+    wire busy, done;
 
-    // Połączenie TB -> DUT
-    top_tb u_tb (
-        .clk  (clk_wire),
-        .rstn (rstn_wire)
+    tb_top i_tb (
+        .clk(clk),
+        .rst_n(rst_n),
+        .op_sel(op_sel), 
+        .start(start),
+        .write_data_in  (wdata), 
+        .read_data(read_data), 
+        .busy(busy), 
+        .done(done)
     );
 
-    dut u_dut (
-        .clk   (clk_wire),
-        .rstn  (rstn_wire),
-        .count (count_wire)
+    dut i_dut (
+        .clk(clk), 
+        .rst_n(rst_n),
+        .op_sel(op_sel), 
+        .start(start),
+        .write_data_in  (wdata), 
+        .read_data(read_data), 
+        .busy(busy), 
+        .done(done)
     );
+    initial begin
+        `ifdef DUMP_WAVES
+            $dumpfile("dump.vcd");
+            $dumpvars(0, top);
+        `endif
+    end
+
 endmodule
-
-
-
