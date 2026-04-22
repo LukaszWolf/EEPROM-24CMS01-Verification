@@ -15,3 +15,7 @@ usage_statistics_webtalk.xml
 *~
 *.swp
 *.bak
+
+# coverage report
+cov/
+xsim.codeCov/
