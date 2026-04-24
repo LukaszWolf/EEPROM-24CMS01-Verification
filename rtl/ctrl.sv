@@ -3,7 +3,8 @@
 import i2c_operations_pkg::*;
 
 module controller (
-    input logic [15:0] addr_in,
+    input logic [2:0]   datacount,
+    input logic [15:0]  addr_in,
     input  logic        clk,
     input  logic        rst_n,
     input  operation_t  op_sel,
@@ -30,14 +31,14 @@ module controller (
     logic [7:0]  ctrl_w, ctrl_r;
     logic [7:0]  addr_h, addr_l;
     logic [1:0]  addr_len;    
-    logic [1:0]  data_len;    
+    logic [3:0]  data_len;    
     logic [2:0]  step_cnt;    
     logic        is_reading;   
 
     logic [11:0] pwr_cnt; 
     logic [7:0]  tx_data;
     logic [3:0]  bit_idx;
-    logic [1:0]  byte_idx;
+    logic [3:0]  byte_idx;
     logic [7:0]  rx_temp;
     logic sda_out, sda_oe;
 
@@ -72,6 +73,7 @@ module controller (
                     is_reading <= 0; 
                     is_write   <= 0;
                     step_cnt <= 0;
+                    byte_idx <= 0;
                     case (op_sel)
                         OP_READ_ID: begin
                             ctrl_w   <= 8'hF8; 
@@ -94,7 +96,7 @@ module controller (
                             addr_h   <= addr_in[15:8]; // Word Address High
                             addr_l   <= addr_in[7:0]; // Word Address Low
                             addr_len <= 2;     
-                            data_len <= 1;
+                            data_len <= 1 + datacount;
                         end
                         OP_WRITE_DATA: begin
                             ctrl_w   <= 8'hA0; 
@@ -102,6 +104,7 @@ module controller (
                             addr_l   <= addr_in[7:0]; // Adres zapisu L
                             addr_len <= 2;
                             is_write <= 1;
+                            data_len <= 1 + datacount;
                         end
                     endcase
                     state <= START_BIT;
@@ -140,15 +143,14 @@ module controller (
                                 state <= SEND_BYTE;
                                 bit_idx <= 7;
                             end else if (is_write) begin
-                               
-                                tx_data <= write_data_in;
-                                
-                                state <= SEND_BYTE;
-                                bit_idx <= 7;
-                                is_write <= 0; 
-                                step_cnt <= 4; 
-                            end else if (step_cnt == 4) begin
-                                state <= STOP;
+                                if (byte_idx < data_len) begin
+                                                    tx_data <= write_data_in; // Pobranie danych do wysłania
+                                                    byte_idx <= byte_idx + 1; // Zwiększenie licznika wysłanych bajtów
+                                                    state <= SEND_BYTE;       // Powrót do wysyłania kolejnego bajtu
+                                                    bit_idx <= 7;
+                                                end else begin
+                                                    state <= STOP;            // Wszystkie bajty wysłane
+                                                end
                             end else begin
                                 state <= REP_START;
                             end

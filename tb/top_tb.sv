@@ -3,6 +3,7 @@
 import i2c_operations_pkg::*;
 
 module tb_top (
+    output logic [2:0] datacount,
     output logic [15:0] addr_in,
     output logic       clk,
     output logic       rst_n,
@@ -65,7 +66,7 @@ module tb_top (
 
             if (!std::randomize(local_rand_addr)) $error("Błąd randomizacji adresu");
             if (!std::randomize(write_data_in))    $error("Błąd randomizacji danych");
-            
+            if (!std::randomize(datacount))       $error("Err");
             addr_in       = local_rand_addr;
             expected_data = write_data_in;
             // --- 11: Write data---
