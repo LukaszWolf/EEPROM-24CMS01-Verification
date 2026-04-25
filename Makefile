@@ -1,6 +1,7 @@
 GUI    ?= 0
 WAVE   ?= 0
 COV    ?= 0
+V 	   ?= UVM_LOW
 SNAPSHOT = sim_snapshot
 TOP_MODULE = tb_lib.top
 LOG_DIR    = logs
@@ -39,13 +40,13 @@ comp_rtl:
 
 comp_tb:
 	@echo -n "TB COMPILATION(tb_lib)...  "
-	@xvlog $(VLOG_FLAGS) -sv -work tb_lib -L rtl_lib -f tb/tb.f -log $(LOG_DIR)/comp_tb.log $(QUIET) \
+	@xvlog $(VLOG_FLAGS) -L uvm -sv -work tb_lib -L rtl_lib -f tb/tb.f -log $(LOG_DIR)/comp_tb.log $(QUIET) \
         || (echo "ERROR! log:"; cat $(LOG_DIR)/comp_tb.log; exit 1)
 	@echo "OK"
 
 elab:
 	@echo -n "Elaboration...              "
-	@xelab -debug typical $(COV_ELAB) $(TOP_MODULE) -L rtl_lib -L tb_lib -s $(SNAPSHOT) -log $(LOG_DIR)/elab.log $(QUIET) \
+	@xelab -debug typical $(COV_ELAB) -L uvm $(TOP_MODULE) -L rtl_lib -L tb_lib -timescale 1ns/1ps -s $(SNAPSHOT) -log $(LOG_DIR)/elab.log $(QUIET) \
         || (echo "ERROR! log:"; cat $(LOG_DIR)/elab.log; exit 1)
 	@echo "OK"
 
@@ -61,7 +62,7 @@ endif
 
 run:
 	@echo -n "Simulation...               "
-	@xsim $(SNAPSHOT) $(XSIM_FLAGS) -cov_db_name $(SNAPSHOT) -log $(LOG_DIR)/xsim.log $(QUIET) \
+	@xsim $(SNAPSHOT) $(XSIM_FLAGS) -testplusarg UVM_VERBOSITY=$(V) -cov_db_name $(SNAPSHOT) -log $(LOG_DIR)/xsim.log $(QUIET) \
         || (echo "ERROR! log:"; cat $(LOG_DIR)/xsim.log; exit 1)
 	@echo "OK"
 
