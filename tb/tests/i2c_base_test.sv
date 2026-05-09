@@ -23,7 +23,7 @@ class i2c_base_test extends uvm_test;
 
     virtual function void start_of_simulation_phase(uvm_phase phase);
         super.start_of_simulation_phase(phase);
-        uvm_top.set_timeout(1000ms, 0); 
+        uvm_top.set_timeout(500ms, 0); 
     endfunction
 
     virtual task main_phase(uvm_phase phase);
