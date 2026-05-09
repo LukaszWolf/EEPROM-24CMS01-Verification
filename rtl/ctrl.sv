@@ -100,8 +100,8 @@ module controller (
                         end
                         OP_WRITE_DATA: begin
                             ctrl_w   <= 8'hA0; 
-                            addr_h   <= addr_in[15:8]; // Adres zapisu H
-                            addr_l   <= addr_in[7:0]; // Adres zapisu L
+                            addr_h   <= addr_in[15:8];
+                            addr_l   <= addr_in[7:0];
                             addr_len <= 2;
                             is_write <= 1;
                             data_len <= 1 + datacount;
@@ -144,12 +144,12 @@ module controller (
                                 bit_idx <= 7;
                             end else if (is_write) begin
                                 if (byte_idx < data_len) begin
-                                                    tx_data <= write_data_in; // Pobranie danych do wysłania
-                                                    byte_idx <= byte_idx + 1; // Zwiększenie licznika wysłanych bajtów
-                                                    state <= SEND_BYTE;       // Powrót do wysyłania kolejnego bajtu
+                                                    tx_data <= write_data_in; 
+                                                    byte_idx <= byte_idx + 1;
+                                                    state <= SEND_BYTE;
                                                     bit_idx <= 7;
                                                 end else begin
-                                                    state <= STOP;            // Wszystkie bajty wysłane
+                                                    state <= STOP;
                                                 end
                             end else begin
                                 state <= REP_START;

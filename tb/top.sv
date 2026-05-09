@@ -1,45 +1,39 @@
 `timescale 1ns / 10ps
 
 module top();
-    wire [2:0] datacount;
-    wire [15:0] addr;
-    wire clk, rst_n;
-    operation_t op_sel;
-    wire start;
-    wire [7:0] wdata;
-    wire [23:0] read_data;
-    wire busy, done;
+    import uvm_pkg::*;
+    import i2c_pkg::*;
 
-    tb_top i_tb (
-        .datacount(datacount),
-        .addr_in(addr),
-        .clk(clk),
-        .rst_n(rst_n),
-        .op_sel(op_sel), 
-        .start(start),
-        .write_data_in  (wdata), 
-        .read_data(read_data), 
-        .busy(busy), 
-        .done(done)
-    );
-
-    dut i_dut (
-        .datacount(datacount),
-        .addr_in(addr),
-        .clk(clk), 
-        .rst_n(rst_n),
-        .op_sel(op_sel), 
-        .start(start),
-        .write_data_in  (wdata), 
-        .read_data(read_data), 
-        .busy(busy), 
-        .done(done)
-    );
+    logic clk;
     initial begin
-        `ifdef DUMP_WAVES
-            $dumpfile("dump.vcd");
-            $dumpvars(0, top);
-        `endif
+        clk = 0;
+        forever #5 clk = ~clk;
     end
 
+    i2c_if vif(clk);
+
+    dut i_dut (
+        .clk            (clk),
+        .rst_n          (vif.rst_n),
+        .datacount      (vif.datacount),
+        .addr_in        (vif.addr_in),
+        .op_sel         (vif.op_sel),
+        .start          (vif.start),
+        .write_data_in  (vif.write_data_in),
+        .read_data      (vif.read_data),
+        .busy           (vif.busy),
+        .done           (vif.done)
+    );
+ 
+    initial begin
+        uvm_config_db#(virtual i2c_if)::set(null, "*", "vif", vif);
+        run_test();
+    end
+
+    initial begin
+        if ($test$plusargs("DUMP_WAVES")) begin
+            $dumpfile("dump.vcd");
+            $dumpvars(0, top);
+        end
+    end
 endmodule

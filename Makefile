@@ -1,3 +1,4 @@
+TEST   ?= i2c_base_test
 GUI    ?= 0
 WAVE   ?= 0
 COV    ?= 0
@@ -62,7 +63,7 @@ endif
 
 run:
 	@echo -n "Simulation...               "
-	@xsim $(SNAPSHOT) $(XSIM_FLAGS) -testplusarg UVM_VERBOSITY=$(V) -cov_db_name $(SNAPSHOT) -log $(LOG_DIR)/xsim.log $(QUIET) \
+	@xsim $(SNAPSHOT) $(XSIM_FLAGS) -testplusarg UVM_VERBOSITY=$(V) -testplusarg UVM_TESTNAME=$(TEST) -cov_db_name $(SNAPSHOT) -log $(LOG_DIR)/xsim.log $(QUIET) \
         || (echo "ERROR! log:"; cat $(LOG_DIR)/xsim.log; exit 1)
 	@echo "OK"
 
