@@ -1,5 +1,5 @@
-`ifndef I2C_SEQUENCE_ITEM_SV
-`define I2C_SEQUENCE_ITEM_SV
+`ifndef I2C_ITEM_SV
+`define I2C_ITEM_SV
 
 class i2c_item extends uvm_sequence_item;
     `uvm_object_utils(i2c_item)
