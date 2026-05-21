@@ -6,6 +6,7 @@ class i2c_env extends uvm_env;
 
     i2c_sequencer m_seqr;
     i2c_driver    m_drv;
+    i2c_monitor   m_monitor;
 
     function new(string name, uvm_component parent);
         super.new(name, parent);
@@ -16,6 +17,7 @@ class i2c_env extends uvm_env;
         
         m_seqr = i2c_sequencer::type_id::create("m_seqr", this);
         m_drv  = i2c_driver::type_id::create("m_drv", this);
+        m_monitor = i2c_monitor::type_id::create("m_monitor", this);
     endfunction
 
     virtual function void connect_phase(uvm_phase phase);
