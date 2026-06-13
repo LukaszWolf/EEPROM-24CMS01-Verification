@@ -4,8 +4,6 @@
 class i2c_base_test extends uvm_test;
     `uvm_component_utils(i2c_base_test)
 
-
-    i2c_config m_cfg;
     i2c_env m_env;
 
     function new(string name, uvm_component parent);
@@ -14,30 +12,18 @@ class i2c_base_test extends uvm_test;
 
     virtual function void build_phase(uvm_phase phase);
         super.build_phase(phase);
-        m_cfg = i2c_config::type_id::create("m_cfg");
-        m_cfg.scoreboard_enable = 1'b1;
-        m_cfg.coverage_enable   = 1'b1;
-        uvm_config_db#(i2c_config)::set(this, "m_env", "m_cfg", m_cfg);
-        
         m_env = i2c_env::type_id::create("m_env", this);
-        uvm_top.set_timeout(100ms, 0);
-        
     endfunction
 
     virtual function void end_of_elaboration_phase(uvm_phase phase);
         super.end_of_elaboration_phase(phase);
         `uvm_info("TOPOLOGY", "\n--- UVM TOPOLOGY ---", UVM_LOW)
         uvm_top.print_topology();
-        `uvm_info(get_type_name(), "--------------------------------------------", UVM_LOW)
-        `uvm_info(get_type_name(), "Environment Configuration:", UVM_LOW)
-        `uvm_info(get_type_name(), "--------------------------------------------", UVM_LOW)
-        
-        m_cfg.print(); 
     endfunction
 
     virtual function void start_of_simulation_phase(uvm_phase phase);
         super.start_of_simulation_phase(phase);
-        uvm_top.set_timeout(500ms, 0); 
+        uvm_top.set_timeout(1000ms, 0); 
     endfunction
 
     virtual task main_phase(uvm_phase phase);

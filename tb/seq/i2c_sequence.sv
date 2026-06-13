@@ -10,7 +10,7 @@ class i2c_base_seq extends uvm_sequence #(i2c_item);
     virtual task body();
         `uvm_info(get_name(), "Starting i2c_base_seq", UVM_LOW)
 
-        repeat(80) begin
+        repeat(8000) begin
 
             req = i2c_item::type_id::create("req");
 
