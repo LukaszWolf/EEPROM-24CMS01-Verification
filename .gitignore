@@ -19,3 +19,6 @@ usage_statistics_webtalk.xml
 # coverage report
 cov/
 xsim.codeCov/
+xsim.covdb/
+xsim_coverage_report/
+
