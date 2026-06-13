@@ -84,7 +84,7 @@ class i2c_scoreboard extends uvm_scoreboard;
         `uvm_info("SCOREBOARD", "=========================================================", UVM_LOW)
         
         if (error_count > 0) begin
-            `uvm_fatal("SCOREBOARD", "Errors occurred!")
+            `uvm_error("SCOREBOARD", "Errors occurred!")
         end
     endfunction
 

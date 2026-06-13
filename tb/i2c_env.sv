@@ -8,7 +8,7 @@ class i2c_env extends uvm_env;
     i2c_driver    m_drv;
     i2c_monitor   m_monitor;
     i2c_scoreboard m_scb;
-i2c_config     m_cfg;
+    i2c_config     m_cfg;
     i2c_coverage   m_cov;
     function new(string name, uvm_component parent);
         super.new(name, parent);

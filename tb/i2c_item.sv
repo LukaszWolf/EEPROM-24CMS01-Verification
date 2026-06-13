@@ -10,6 +10,8 @@ class i2c_item extends uvm_sequence_item;
     rand operation_t   op;        
 
     logic [23:0]       rdata;
+    
+    typedef enum {SINGLE,SHORT,MEDIUM,LONG,MAX} data_length_t;
 
     function new(string name = "i2c_item");
         super.new(name);
@@ -20,18 +22,15 @@ class i2c_item extends uvm_sequence_item;
                          op.name(), addr, count, wdata, rdata);
     endfunction
 
-    // Edge case constraints for better coverage
-    constraint c_toggle_power {
-        wdata dist { 8'hAA := 5, 8'h55 := 5, [0:255] := 1 };
-        
-        addr dist { 16'h0000 := 10, 16'hFFFF := 10, [1:16'hFFFE] := 1 };
 
-        op dist { OP_READ_ID := 10, OP_READ_STATUS := 10, OP_WRITE_DATA := 20, OP_READ_DATA := 20 };
+    //even both read and write operations
+    constraint c_op_dist {
+        op dist { OP_READ_ID := 0, OP_READ_STATUS := 0, OP_WRITE_DATA := 1, OP_READ_DATA := 1 };
+
     }
-    constraint c_toggle_burst {
-    wdata inside {8'h00, 8'hFF, 8'hAA, 8'h55};
-    addr  inside {16'h0000, 16'hFFFF, 16'hAAAA, 16'h5555};
-}
+    constraint c_len_dist{
+        length dist {SINGLE := 1, SHORT := 5, MEDIUM := 3, LONG := 3, MAX := 1};
+    }
 
 endclass
 

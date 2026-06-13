@@ -11,3 +11,4 @@ interface i2c_if (input logic clk);
     logic        busy;          
     logic        done;
 endinterface
+
