@@ -3,6 +3,7 @@ GUI    ?= 0
 WAVE   ?= 0
 COV    ?= 0
 V 	   ?= UVM_LOW
+SEED   ?= 1
 SNAPSHOT = sim_snapshot
 TOP_MODULE = tb_lib.top
 LOG_DIR    = logs
@@ -63,7 +64,7 @@ endif
 
 run:
 	@echo -n "Simulation...               "
-	@xsim $(SNAPSHOT) $(XSIM_FLAGS) -testplusarg UVM_VERBOSITY=$(V) -testplusarg UVM_TESTNAME=$(TEST) -cov_db_name $(SNAPSHOT) -log $(LOG_DIR)/xsim.log $(QUIET) \
+	@xsim $(SNAPSHOT) $(XSIM_FLAGS) -sv_seed $(SEED) -testplusarg UVM_VERBOSITY=$(V) -testplusarg UVM_TESTNAME=$(TEST) -cov_db_name $(SNAPSHOT) -log $(LOG_DIR)/xsim.log $(QUIET) \
         || (echo "ERROR! log:"; cat $(LOG_DIR)/xsim.log; exit 1)
 	@echo "OK"
 

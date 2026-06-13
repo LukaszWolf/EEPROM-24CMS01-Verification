@@ -13,16 +13,16 @@ class i2c_base_seq extends uvm_sequence #(i2c_item);
         //at least one read and write
         req =i2c_item::type_id::create("req");
         start_item(req);
-        if (!req.randomize() with { op == OP_WRITE_DATA; }) 
-            'uvm_error(get_name(), "Failed to randomize a write operation for the first transaction");
+        if (!req.randomize() with { op == OP_WRITE_DATA; }) begin
+            `uvm_error(get_name(), "Failed to randomize a write operation for the first transaction")
         end
         finish_item(req);
 
 
         req =i2c_item::type_id::create("req");
         start_item(req);
-        if (!req.randomize() with { op == OP_READ_DATA; })
-            'uvm_error(get_name(), "Failed to randomize a read operation for the second transaction");
+        if (!req.randomize() with { op == OP_READ_DATA; }) begin
+            `uvm_error(get_name(), "Failed to randomize a read operation for the second transaction")
         end
         finish_item(req);
         

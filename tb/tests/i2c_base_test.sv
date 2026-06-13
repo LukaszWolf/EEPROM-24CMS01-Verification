@@ -41,7 +41,7 @@ class i2c_base_test extends uvm_test;
     endfunction
 
     virtual task main_phase(uvm_phase phase);
-        i2c_aggressive_seq m_seq = i2c_base_seq::type_id::create("m_seq");
+        i2c_base_seq m_seq = i2c_base_seq::type_id::create("m_seq");
         
         phase.get_objection().set_drain_time(this, 50us); 
         phase.raise_objection(this);

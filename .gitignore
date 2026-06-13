@@ -22,3 +22,6 @@ xsim.codeCov/
 xsim.covdb/
 xsim_coverage_report/
 
+# local helper scripts
+constraints_logger.sh
+
