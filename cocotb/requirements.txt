@@ -1,0 +1,13 @@
+# Python dependencies for the cocotb testbench.
+#
+# Setup:
+#   python3 -m venv ~/cocotb-venv
+#   source ~/cocotb-venv/bin/activate
+#   pip install -r requirements.txt
+#
+# Also requires a cocotb-supported simulator in $PATH (e.g. Icarus Verilog >= 11).
+
+cocotb==2.0.1
+
+# Optional: enables nicer AssertionError messages and pytest-style running.
+# pytest
